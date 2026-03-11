@@ -1,0 +1,14 @@
+# 認証ファイル（コミットしない）
+.notebooklm-mcp-cli/
+.nlm/
+.claude.json
+.bash_history
+
+# キャッシュ・一時ファイル
+.cache/
+.npm/
+__pycache__/
+*.pyc
+
+# Claude Code 内部ファイル
+.claude/projects/
