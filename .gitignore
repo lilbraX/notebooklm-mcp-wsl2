@@ -3,6 +3,7 @@
 .nlm/
 .claude.json
 .bash_history
+.google-credentials.json
 
 # キャッシュ・一時ファイル
 .cache/
