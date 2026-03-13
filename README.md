@@ -100,4 +100,6 @@ https://youtu.be/XXXXXXXXXXX
 |---|---|
 | `~/.google-credentials.json` | Google サービスアカウントキー（`.gitignore` で除外） |
 | `~/.claude/commands/youtube-summary.md` | スキル定義ファイル |
-| `~/watched.md` | 視聴済み動画リンク集 |
+| `~/watched.md` | 視聴済み動画リンク集（タイトル・URL・日付） |
+
+`watched.md` はスキル実行時に手動で更新する視聴履歴ファイルです。Google ドキュメントには要約全文が、`watched.md` にはリンクと概要が保存されます。
