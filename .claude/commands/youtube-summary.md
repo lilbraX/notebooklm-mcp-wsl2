@@ -6,8 +6,7 @@
 ## 実行手順
 
 1. **トランスクリプトの取得**
-   以下の Python スクリプトを Bash で実行してトランスクリプトを取得する。
-   動画 ID は URL から抽出すること（例: `youtu.be/XXXXX` や `?v=XXXXX`）。
+   動画 ID を URL から抽出し（例: `youtu.be/XXXXX` や `?v=XXXXX`）、以下を実行：
 
    ```bash
    uv run --with youtube-transcript-api python3 - <<'EOF'
@@ -18,7 +17,6 @@
    video_id = "VIDEO_ID_HERE"
 
    try:
-       # インスタンス化してから使う（v1.2.4+）
        api = YouTubeTranscriptApi()
        transcript_list = api.list(video_id)
        try:
@@ -45,6 +43,53 @@
    - 詳細内容（見出しと箇条書きで構造化）
    - 重要なポイントや結論
 
+4. **Google ドキュメントに保存**
+   要約が完成したら、以下の Python スクリプトで Google ドキュメントに追記する。
+   `TITLE`・`URL`・`SUMMARY` を実際の値に置き換えること。
+
+   ```bash
+   uv run --with google-api-python-client --with google-auth python3 - <<'EOF'
+   from google.oauth2 import service_account
+   from googleapiclient.discovery import build
+   import datetime
+
+   DOCUMENT_ID = '1foeyV5e-3eRy0rRjqEA_AgkWNfw3l0V0BIm4RrsBhL4'
+   CREDENTIALS_FILE = '/home/yugo2/.google-credentials.json'
+
+   title = "TITLE"
+   url = "URL"
+   summary = """SUMMARY"""
+   date = datetime.date.today().isoformat()
+
+   creds = service_account.Credentials.from_service_account_file(
+       CREDENTIALS_FILE,
+       scopes=['https://www.googleapis.com/auth/documents']
+   )
+   service = build('docs', 'v1', credentials=creds)
+
+   # 既存のドキュメントの末尾インデックスを取得
+   doc = service.documents().get(documentId=DOCUMENT_ID).execute()
+   end_index = doc['body']['content'][-1]['endIndex'] - 1
+
+   content = f"\n{'='*60}\n{title}\nURL: {url}\n日付: {date}\n\n{summary}\n"
+
+   requests = [{
+       'insertText': {
+           'location': {'index': end_index},
+           'text': content
+       }
+   }]
+
+   service.documents().batchUpdate(
+       documentId=DOCUMENT_ID,
+       body={'requests': requests}
+   ).execute()
+
+   print("Google ドキュメントに保存しました")
+   EOF
+   ```
+
 ## 注意事項
 - トランスクリプトが取得できない場合（字幕なし動画など）はその旨を伝える
 - NotebookLM は使わない（クッキー不要）
+- 要約はチャットにも表示し、Google ドキュメントにも保存する
